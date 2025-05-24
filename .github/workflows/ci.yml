@@ -52,7 +52,7 @@ jobs:
           --network github_network \
           migrate/migrate \
           -path=/migrations \
-          -database "postgres://postgres:1@db-1:5432/bakery?sslmode=disable&search_path=bakery" up
+          -database "postgres://postgres:1@bakery_prj-db-1:5432/bakery?sslmode=disable&search_path=bakery" up
 
       - name: Build Go app
         run: |
