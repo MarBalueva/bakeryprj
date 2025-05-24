@@ -32,12 +32,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
-
-      - name: Install golang-migrate CLI
-        run: |
-          curl -L https://github.com/golang-migrate/migrate/releases/download/v4.16.2/migrate.linux-amd64.tar.gz | tar xvz
-          sudo mv migrate /usr/local/bin
+          go-version: '1.23'
 
       - name: Wait for PostgreSQL to be ready
         run: |
@@ -46,13 +41,13 @@ jobs:
             sleep 2
           done
 
-      - name: Run database migrations
+      - name: Run database migrations using migrate docker image
         run: |
           docker run --rm -v ${{ github.workspace }}/migrations:/migrations \
-          --network github_network \
-          migrate/migrate \
-          -path=/migrations \
-          -database "postgres://postgres:1@bakery_prj-db-1:5432/bakery?sslmode=disable&search_path=bakery" up
+            --network host \
+            migrate/migrate \
+            -path=/migrations \
+            -database "postgres://postgres:1@localhost:5432/bakery?sslmode=disable&search_path=bakery" up
 
       - name: Build Go app
         run: |
