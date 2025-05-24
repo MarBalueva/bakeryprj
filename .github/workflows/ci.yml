@@ -41,6 +41,10 @@ jobs:
             sleep 2
           done
 
+      - name: Create schema bakery if not exists
+        run: |
+          PGPASSWORD=1 psql -h localhost -U postgres -d bakery -c "CREATE SCHEMA IF NOT EXISTS bakery;"
+
       - name: Run database migrations using migrate docker image
         run: |
           docker run --rm -v ${{ github.workspace }}/migrations:/migrations \
