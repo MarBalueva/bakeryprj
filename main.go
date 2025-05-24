@@ -14,7 +14,8 @@ import (
 // @title Bakery App API
 // @version 1.0
 // @description REST API для онлайн-магазина кондитерских изделий
-// @host localhost:8080
+// @host localhost
+// @schemes https
 // @BasePath /
 // @securityDefinitions.apikey BearerAuth
 // @in header

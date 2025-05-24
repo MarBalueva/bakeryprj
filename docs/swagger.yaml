@@ -206,7 +206,7 @@ definitions:
       productid:
         type: integer
     type: object
-host: localhost:8080
+host: localhost
 info:
   contact: {}
   description: REST API для онлайн-магазина кондитерских изделий
@@ -1357,6 +1357,8 @@ paths:
       summary: Обновить пользователя
       tags:
       - Users
+schemes:
+- https
 securityDefinitions:
   BearerAuth:
     in: header
