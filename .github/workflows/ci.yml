@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: 1
+          POSTGRES_DB: bakery
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.21'
+
+    - name: Install migrate tool
+      run: go install github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+
+    - name: Run migrations
+      run: migrate -path migrations -database "postgres://postgres:1@localhost:5432/bakery?sslmode=disable&search_path=bakery" up
+
+    - name: Build the project
+      run: go build ./...
