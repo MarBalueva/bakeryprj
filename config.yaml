@@ -1,0 +1,7 @@
+app:
+  env: development
+  port: 8080
+database:
+  host: localhost
+  user: postgres
+  password: 1
