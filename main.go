@@ -2,7 +2,10 @@ package main
 
 import (
 	"bakeryapp/config"
+	"bakeryapp/logger"
 	"bakeryapp/routes"
+	"log"
+	"strconv"
 
 	_ "bakeryapp/docs"
 
@@ -21,7 +24,15 @@ import (
 // @in header
 // @name Authorization
 func main() {
+	config.LoadConfig()
+
+	logger.InitLogger()
+
+	logger.Log.Info("Запуск приложения")
+	logger.Log.Infof("ENV: %s, PORT: %d", config.Cfg.App.Env, config.Cfg.App.Port)
+
 	db := config.ConnectDB()
+
 	r := gin.Default()
 
 	routes.RegisterAuthRoutes(r, db)
@@ -32,7 +43,10 @@ func main() {
 	routes.RegisterBasketRoutes(r, db)
 	routes.RegisterClientRoutes(r, db)
 	routes.RegisterPaymentRoutes(r, db)
+
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	r.Run(":8080")
+	port := strconv.Itoa(config.Cfg.App.Port)
+	log.Println("Starting server on port:", port)
+	r.Run(":" + port)
 }

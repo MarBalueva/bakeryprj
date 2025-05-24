@@ -10,7 +10,6 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// Config — структура для конфигурации из YAML
 type Config struct {
 	App struct {
 		Env  string `yaml:"env"`
@@ -20,12 +19,13 @@ type Config struct {
 		Host     string `yaml:"host"`
 		User     string `yaml:"user"`
 		Password string `yaml:"password"`
+		Name     string `yaml:"name"`
+		Port     int    `yaml:"port"`
 	} `yaml:"database"`
 }
 
 var Cfg Config
 
-// LoadEnv загружает .env файл (если есть)
 func LoadEnv() {
 	err := godotenv.Load()
 	if err != nil {
@@ -33,7 +33,6 @@ func LoadEnv() {
 	}
 }
 
-// GetEnv возвращает значение переменной окружения или дефолт
 func GetEnv(key, defaultValue string) string {
 	value, exists := os.LookupEnv(key)
 	if !exists {
@@ -42,7 +41,6 @@ func GetEnv(key, defaultValue string) string {
 	return value
 }
 
-// LoadYAMLConfig загружает конфиг из YAML файла
 func LoadYAMLConfig(filename string) error {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -57,16 +55,13 @@ func LoadYAMLConfig(filename string) error {
 	return nil
 }
 
-// LoadConfig инициализация конфигурации из .env и yaml
 func LoadConfig() {
 	LoadEnv()
 
-	// Загружаем yaml, игнорируем ошибку
 	if err := LoadYAMLConfig("config.yaml"); err != nil {
 		log.Println("Cannot load config.yaml:", err)
 	}
 
-	// Перезаписываем поля из переменных окружения, если есть
 	Cfg.App.Env = GetEnv("APP_ENV", Cfg.App.Env)
 	if portStr := GetEnv("SERVER_PORT", ""); portStr != "" {
 		if port, err := strconv.Atoi(portStr); err == nil {

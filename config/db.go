@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -13,8 +14,13 @@ import (
 )
 
 func ConnectDB() *gorm.DB {
-	dsn := "host=db user=postgres password=1 dbname=bakery port=5432 sslmode=disable search_path=bakery"
-
+	//dsn := "host=db user=postgres password=1 dbname=bakery port=5432 sslmode=disable search_path=bakery"
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=disable search_path=bakery",
+		Cfg.Database.Host,
+		Cfg.Database.User,
+		Cfg.Database.Password,
+		Cfg.Database.Name,
+		Cfg.Database.Port)
 	var db *gorm.DB
 	var err error
 	for i := 0; i < 10; i++ {

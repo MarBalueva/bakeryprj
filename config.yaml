@@ -3,5 +3,7 @@ app:
   port: 8080
 database:
   host: localhost
-  user: postgres
+  user: bakery
   password: 1
+  name: bakery
+  port: 5432
