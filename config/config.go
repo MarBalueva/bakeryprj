@@ -1,8 +1,8 @@
 package config
 
 import (
+	"bakeryapp/logger"
 	"io/ioutil"
-	"log"
 	"os"
 	"strconv"
 
@@ -29,7 +29,7 @@ var Cfg Config
 func LoadEnv() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Println("No .env file found, using system environment variables")
+		logger.Log.Warn("No .env file found, using system environment variables")
 	}
 }
 
@@ -59,7 +59,7 @@ func LoadConfig() {
 	LoadEnv()
 
 	if err := LoadYAMLConfig("config.yaml"); err != nil {
-		log.Println("Cannot load config.yaml:", err)
+		logger.Log.Error("Cannot load config.yaml:", err)
 	}
 
 	Cfg.App.Env = GetEnv("APP_ENV", Cfg.App.Env)

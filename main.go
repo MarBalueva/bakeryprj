@@ -4,7 +4,6 @@ import (
 	"bakeryapp/config"
 	"bakeryapp/logger"
 	"bakeryapp/routes"
-	"log"
 	"strconv"
 
 	_ "bakeryapp/docs"
@@ -47,6 +46,6 @@ func main() {
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	port := strconv.Itoa(config.Cfg.App.Port)
-	log.Println("Starting server on port:", port)
+	logger.Log.Info("Starting server on port:", port)
 	r.Run(":" + port)
 }

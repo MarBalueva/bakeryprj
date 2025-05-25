@@ -1,8 +1,8 @@
 package config
 
 import (
+	"bakeryapp/logger"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/golang-migrate/migrate/v4"
@@ -28,36 +28,36 @@ func ConnectDB() *gorm.DB {
 		if err == nil {
 			break
 		}
-		log.Printf("DB connection attempt %d failed: %v", i+1, err)
+		logger.Log.Errorf("DB connection attempt %d failed: %v", i+1, err)
 		time.Sleep(2 * time.Second)
 	}
 	if err != nil {
-		log.Fatal("DB connection error: ", err)
+		logger.Log.Error("DB connection error: ", err)
 	}
 
 	sqlDB, err := db.DB()
 	if err != nil {
-		log.Fatal("Failed to get sql.DB from gorm.DB: ", err)
+		logger.Log.Error("Failed to get sql.DB from gorm.DB: ", err)
 	}
 
 	driver, err := pgDriver.WithInstance(sqlDB, &pgDriver.Config{})
 	if err != nil {
-		log.Fatal("Failed to create DB driver: ", err)
+		logger.Log.Error("Failed to create DB driver: ", err)
 	}
 
 	m, err := migrate.NewWithDatabaseInstance("file://migrations", "postgres", driver)
 	if err != nil {
-		log.Fatal("Migration init error: ", err)
+		logger.Log.Error("Migration init error: ", err)
 	}
 
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
-		log.Fatal("Migration failed: ", err)
+		logger.Log.Error("Migration failed: ", err)
 	} else if err == migrate.ErrNoChange {
-		log.Println("No new migrations to apply")
+		logger.Log.Info("No new migrations to apply")
 	} else {
-		log.Println("Migrations applied successfully")
+		logger.Log.Info("Migrations applied successfully")
 	}
 
-	log.Println("DB connected and migrated successfully")
+	logger.Log.Info("DB connected and migrated successfully")
 	return db
 }
