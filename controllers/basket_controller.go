@@ -18,35 +18,32 @@ import (
 // @Success 200 {object} map[string]string "товар добавлен в корзину"
 // @Failure 400 {object} map[string]string "ошибка валидации"
 // @Failure 500 {object} map[string]string "внутренняя ошибка сервера"
-// @Security Bearer
+// @Security BearerAuth
 // @Router /basket [post]
 func AddProductToBasket(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var item models.ProductInBasket
+
+		// Автоматическая валидация по тегам binding
 		if err := c.ShouldBindJSON(&item); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "некорректные данные: " + err.Error()})
 			return
 		}
 
 		var existing models.ProductInBasket
 		err := db.Where("productid = ? AND clientid = ?", item.ProductID, item.ClientID).First(&existing).Error
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "database error"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "ошибка базы данных"})
 			return
 		}
 
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			// Создаем новую запись
 			if err := db.Create(&item).Error; err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "не удалось добавить товар в корзину"})
 				return
 			}
 		} else {
-			// Обновляем количество товара
 			existing.Count += item.Count
-			if existing.Count < 1 {
-				existing.Count = 1 // минимум 1, или можно удалить запись, если count <= 0
-			}
 			if err := db.Save(&existing).Error; err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "не удалось обновить количество товара"})
 				return
@@ -65,7 +62,7 @@ func AddProductToBasket(db *gorm.DB) gin.HandlerFunc {
 // @Param productId path int true "ID товара"
 // @Success 200 {object} map[string]string "товар удален из корзины"
 // @Failure 500 {object} map[string]string "внутренняя ошибка сервера"
-// @Security Bearer
+// @Security BearerAuth
 // @Router /basket/{clientId}/{productId} [delete]
 func RemoveProductFromBasket(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -89,7 +86,7 @@ func RemoveProductFromBasket(db *gorm.DB) gin.HandlerFunc {
 // @Success 200 {array} models.ProductInBasket "Список товаров в корзине"
 // @Failure 404 {object} map[string]string "корзина не найдена"
 // @Failure 500 {object} map[string]string "внутренняя ошибка сервера"
-// @Security Bearer
+// @Security BearerAuth
 // @Router /basket/{clientId} [get]
 func GetBasketByClientID(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {

@@ -17,7 +17,6 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// Ожидается формат "Bearer <token>"
 		parts := strings.SplitN(authHeader, " ", 2)
 		if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid authorization format"})
@@ -40,7 +39,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		c.Set("userId", userId)
+		c.Set("userid", userId)
 		c.Next()
 	}
 }

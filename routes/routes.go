@@ -40,6 +40,8 @@ func RegisterUserRoutes(router *gin.Engine, db *gorm.DB) {
 		users.DELETE("/:id", middleware.RoleMiddleware(db, "admin"), controllers.DeleteUser(db))
 		users.GET("", middleware.RoleMiddleware(db, "admin"), controllers.GetAllUsers(db))
 		users.GET("/:id", middleware.RoleMiddleware(db, "admin"), controllers.GetUserByID(db))
+		users.GET("/:id/access-groups", middleware.RoleMiddleware(db, "admin"), controllers.GetUserAccessGroups(db))
+		users.PUT("/:id/access-groups", middleware.RoleMiddleware(db, "admin"), controllers.UpdateUserAccessGroups(db))
 	}
 }
 
@@ -48,6 +50,7 @@ func RegisterEmployeeRoutes(router *gin.Engine, db *gorm.DB) {
 	{
 		employees.POST("", middleware.RoleMiddleware(db, "admin"), controllers.CreateEmployee(db))
 		employees.PUT("/:id", middleware.RoleMiddleware(db, "admin"), controllers.UpdateEmployee(db))
+		employees.PUT("/:id/fire", middleware.RoleMiddleware(db, "admin"), controllers.FireEmployee(db))
 		employees.DELETE("/:id", middleware.RoleMiddleware(db, "admin"), controllers.DeleteEmployee(db))
 		employees.GET("", middleware.RoleMiddleware(db, "admin", "manager"), controllers.GetAllEmployees(db))
 		employees.GET("/:id", middleware.RoleMiddleware(db, "admin", "manager"), controllers.GetEmployeeById(db))
@@ -57,11 +60,13 @@ func RegisterEmployeeRoutes(router *gin.Engine, db *gorm.DB) {
 func RegisterOrderRoutes(router *gin.Engine, db *gorm.DB) {
 	orders := router.Group("/orders")
 	{
-		orders.POST("", controllers.CreateOrder(db))
-		orders.GET("", controllers.GetAllOrders(db))
-		orders.GET("/:id", controllers.GetOrderById(db))
-		orders.PUT("/:id", controllers.UpdateOrder(db))
-		orders.DELETE("/:id", controllers.DeleteOrder(db))
+		orders.POST("", middleware.RoleMiddleware(db, "admin", "manager", "client"), controllers.CreateOrder(db))
+		orders.GET("", middleware.RoleMiddleware(db, "admin", "manager", "client"), controllers.GetAllOrders(db))
+		orders.GET("/:id", middleware.RoleMiddleware(db, "admin", "manager", "client"), controllers.GetOrderById(db))
+		orders.GET("/:id/status", middleware.RoleMiddleware(db, "admin", "manager", "client"), controllers.GetOrderStatus(db))
+		orders.PUT("/:id", middleware.RoleMiddleware(db, "admin", "manager", "client"), controllers.UpdateOrder(db))
+		orders.PUT("/:id/status", middleware.RoleMiddleware(db, "admin", "manager"), controllers.UpdateOrderStatus(db))
+		orders.DELETE("/:id", middleware.RoleMiddleware(db, "admin", "manager", "client"), controllers.DeleteOrder(db))
 	}
 }
 
@@ -81,7 +86,7 @@ func RegisterBasketRoutes(router *gin.Engine, db *gorm.DB) {
 	{
 		basket.POST("", middleware.RoleMiddleware(db, "client"), controllers.AddProductToBasket(db))
 		basket.DELETE("/:clientId/:productId", middleware.RoleMiddleware(db, "client"), controllers.RemoveProductFromBasket(db))
-		basket.GET("/:clientId", middleware.RoleMiddleware(db, "client"), controllers.GetBasketByClientID(db))
+		basket.GET("/:clientId", middleware.RoleMiddleware(db, "admin", "client"), controllers.GetBasketByClientID(db))
 	}
 }
 
@@ -91,6 +96,8 @@ func RegisterPaymentRoutes(router *gin.Engine, db *gorm.DB) {
 		payments.POST("", middleware.RoleMiddleware(db, "client", "manager", "admin"), controllers.CreatePayment(db))
 		payments.GET("", middleware.RoleMiddleware(db, "manager", "admin"), controllers.GetAllPayments(db))
 		payments.GET("/order/:orderId", middleware.RoleMiddleware(db, "client", "manager", "admin"), controllers.GetPaymentsByOrder(db))
+		payments.GET("/:id/status", middleware.RoleMiddleware(db, "client", "manager", "admin"), controllers.GetPaymentStatus(db))
+		payments.PUT("/:id/status", middleware.RoleMiddleware(db, "manager", "admin"), controllers.UpdatePaymentStatus(db))
 	}
 }
 
@@ -102,5 +109,15 @@ func RegisterDocumentRoutes(router *gin.Engine, db *gorm.DB) {
 		documents.DELETE("/:id", middleware.RoleMiddleware(db, "admin", "manager"), controllers.DeleteDocument(db))
 		documents.GET("", middleware.RoleMiddleware(db, "admin", "manager"), controllers.GetAllDocuments(db))
 		documents.GET("/:id", middleware.RoleMiddleware(db, "admin", "manager"), controllers.GetDocumentByID(db))
+		documents.PUT("/:id/submit", middleware.RoleMiddleware(db, "admin", "manager"), controllers.SubmitDocument(db))
+	}
+}
+
+func RegisterDictRoutes(router *gin.Engine, db *gorm.DB) {
+	dict := router.Group("/dict")
+	{
+		dict.GET("/:dict", middleware.RoleMiddleware(db, "admin", "manager"), controllers.GetAllDictItems(db))
+		dict.POST("/:dict", middleware.RoleMiddleware(db, "admin", "manager"), controllers.CreateDictItem(db))
+		dict.DELETE("/:dict/:id", middleware.RoleMiddleware(db, "admin", "manager"), controllers.DeleteDictItem(db))
 	}
 }

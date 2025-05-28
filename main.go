@@ -42,6 +42,8 @@ func main() {
 	routes.RegisterBasketRoutes(r, db)
 	routes.RegisterClientRoutes(r, db)
 	routes.RegisterPaymentRoutes(r, db)
+	routes.RegisterDictRoutes(r, db)
+	routes.RegisterDocumentRoutes(r, db)
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 

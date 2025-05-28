@@ -44,10 +44,9 @@ func Register(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		// Проверка на уникальный логин
 		var existing models.Appuser
 		if err := db.Where("login = ?", req.Login).First(&existing).Error; err == nil {
-			c.JSON(http.StatusConflict, gin.H{"error": "login already in use"})
+			c.JSON(http.StatusConflict, gin.H{"error": "логин уже используется"})
 			return
 		} else if !errors.Is(err, gorm.ErrRecordNotFound) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "database error"})
@@ -64,7 +63,7 @@ func Register(db *gorm.DB) gin.HandlerFunc {
 			PhoneNumber: req.Phone,
 		}
 		if err := db.Create(&client).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create client"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "не удалось создать клиента"})
 			return
 		}
 
@@ -76,18 +75,18 @@ func Register(db *gorm.DB) gin.HandlerFunc {
 			IsActive:   true,
 		}
 		if err := db.Create(&user).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "cannot create user"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "не удалось создать пользователя"})
 			return
 		}
 
 		// После успешного создания пользователя:
-		accessSQL := `INSERT INTO user_access (user_id, group_id) VALUES (?, ?)`
-		if err := db.Exec(accessSQL, user.ID, 3).Error; err != nil {
+		accessSQL := `INSERT INTO user_accesses (userid, groupid) VALUES (?, ?)`
+		if err := db.Exec(accessSQL, user.ID, 1).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "не удалось назначить группу доступа"})
 			return
 		}
 
-		c.JSON(http.StatusCreated, gin.H{"message": "user registered"})
+		c.JSON(http.StatusCreated, gin.H{"message": "регистрация успешна"})
 	}
 }
 

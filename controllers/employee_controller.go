@@ -28,15 +28,12 @@ func CreateEmployee(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		// Обнуляем ID, чтобы автоинкремент сработал
 		req.ID = 0
 
-		// Установить текущую дату, если не передан StartDate
 		if req.StartDate.IsZero() {
 			req.StartDate = time.Now()
 		}
 
-		// Обнулить EndDate, если она нулевая
 		if req.EndDate != nil && req.EndDate.IsZero() {
 			req.EndDate = nil
 		}
@@ -46,7 +43,7 @@ func CreateEmployee(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusCreated, gin.H{"message": "employee created", "employee": req})
+		c.JSON(http.StatusCreated, gin.H{"message": "сотрудник создан", "employee": req})
 	}
 }
 
@@ -66,30 +63,48 @@ func UpdateEmployee(db *gorm.DB) gin.HandlerFunc {
 		var emp models.Employee
 		id := c.Param("id")
 
-		// Поиск сотрудника по ID
 		if err := db.First(&emp, id).Error; err != nil {
 			c.JSON(http.StatusNotFound, gin.H{"error": "сотрудник не найден"})
 			return
 		}
 
-		// Считывание входных данных в map, чтобы исключить обновление ID
 		var input map[string]interface{}
 		if err := c.ShouldBindJSON(&input); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		// Удаляем поле id из входных данных, если оно передано
 		delete(input, "id")
 
-		// Если endDate передано как пустое или нулевое значение, зануляем
+		if val, ok := input["jobpositionid"]; ok {
+			switch v := val.(type) {
+			case float64:
+				if v <= 0 {
+					c.JSON(http.StatusBadRequest, gin.H{"error": "jobpositionid должно быть больше 0"})
+					return
+				}
+			case int:
+				if v <= 0 {
+					c.JSON(http.StatusBadRequest, gin.H{"error": "jobpositionid должно быть больше 0"})
+					return
+				}
+			case int64:
+				if v <= 0 {
+					c.JSON(http.StatusBadRequest, gin.H{"error": "jobpositionid должно быть больше 0"})
+					return
+				}
+			default:
+				c.JSON(http.StatusBadRequest, gin.H{"error": "неверный тип для jobpositionid"})
+				return
+			}
+		}
+
 		if endDate, ok := input["enddate"]; ok {
-			if endDate == nil || endDate == "" {
+			if endDate == nil || endDate == "" || endDate == "string" {
 				input["enddate"] = nil
 			}
 		}
 
-		// Обновляем только разрешённые поля
 		if err := db.Model(&emp).Updates(input).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "не удалось обновить сотрудника"})
 			return
@@ -104,7 +119,7 @@ func UpdateEmployee(db *gorm.DB) gin.HandlerFunc {
 // @Tags Employees
 // @Param id path int true "ID сотрудника"
 // @Success 200 {object} map[string]string
-// @Failure 404 {object} map[string]string
+// @Failure 404,500 {object} map[string]string
 // @Router /employees/{id} [delete]
 // @Security BearerAuth
 func DeleteEmployee(db *gorm.DB) gin.HandlerFunc {
@@ -112,20 +127,21 @@ func DeleteEmployee(db *gorm.DB) gin.HandlerFunc {
 		var emp models.Employee
 		id := c.Param("id")
 
-		// Поиск сотрудника
 		if err := db.First(&emp, id).Error; err != nil {
 			c.JSON(http.StatusNotFound, gin.H{"error": "сотрудник не найден"})
 			return
 		}
-
-		// Установка даты завершения работы
-		now := time.Now()
-		if err := db.Model(&emp).Update("enddate", now).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "не удалось завершить сотрудника"})
+		if !emp.IsDeleted {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "сотрудник уже удалён"})
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"message": "сотрудник помечен как завершивший работу"})
+		if err := db.Model(&emp).Update("isdeleted", true).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "не удалось удалить сотрудника"})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "сотрудник помечен как удаленный"})
 	}
 }
 
@@ -139,7 +155,10 @@ func DeleteEmployee(db *gorm.DB) gin.HandlerFunc {
 func GetAllEmployees(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var emps []models.Employee
-		db.Find(&emps)
+		if err := db.Where("isdeleted = ?", false).Find(&emps).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "не удалось получить сотрудников"})
+			return
+		}
 		c.JSON(http.StatusOK, emps)
 	}
 }
@@ -150,17 +169,51 @@ func GetAllEmployees(db *gorm.DB) gin.HandlerFunc {
 // @Produce json
 // @Param id path int true "ID сотрудника"
 // @Success 200 {object} models.Employee
-// @Failure 404 {object} map[string]string
+// @Failure 404,500 {object} map[string]string
 // @Router /employees/{id} [get]
 // @Security BearerAuth
 func GetEmployeeById(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var emp models.Employee
 		id := c.Param("id")
+		if err := db.Where("id = ? AND isdeleted = ?", id, false).First(&emp).Error; err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "сотрудник не найден"})
+			return
+		}
+		c.JSON(http.StatusOK, emp)
+	}
+}
+
+// @Summary Уволить сотрудника
+// @Description Устанавливает поле enddate текущей датой для сотрудника с заданным ID
+// @Tags employees
+// @Accept json
+// @Produce json
+// @Param id path int true "ID сотрудника"
+// @Success 200 {object} models.Employee
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /employees/{id}/fire [PUT]
+// @Security BearerAuth
+func FireEmployee(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var emp models.Employee
+		id := c.Param("id")
+
 		if err := db.First(&emp, id).Error; err != nil {
 			c.JSON(http.StatusNotFound, gin.H{"error": "сотрудник не найден"})
 			return
 		}
+
+		now := time.Now()
+		emp.EndDate = &now
+
+		if err := db.Save(&emp).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "не удалось уволить сотрудника"})
+			return
+		}
+
 		c.JSON(http.StatusOK, emp)
 	}
 }

@@ -33,12 +33,11 @@ func RoleMiddleware(db *gorm.DB, allowedRoles ...string) gin.HandlerFunc {
 			return
 		}
 
-		// Получить группы пользователя из userAccess
 		var roles []string
 		err = db.Raw(`
 			SELECT ag.name
-			FROM userAccess ua
-			JOIN accessgroup ag ON ag.id = ua.groupid
+			FROM user_accesses ua
+			JOIN access_groups ag ON ag.id = ua.groupid
 			WHERE ua.userid = ?
 		`, userID).Scan(&roles).Error
 
@@ -48,7 +47,6 @@ func RoleMiddleware(db *gorm.DB, allowedRoles ...string) gin.HandlerFunc {
 			return
 		}
 
-		// Проверить пересечение с разрешёнными
 		for _, userRole := range roles {
 			for _, allowed := range allowedRoles {
 				if userRole == allowed {

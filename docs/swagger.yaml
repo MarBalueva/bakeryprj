@@ -41,8 +41,6 @@ definitions:
         type: integer
       id:
         type: integer
-      is_deleted:
-        type: boolean
       isActive:
         type: boolean
       login:
@@ -56,8 +54,6 @@ definitions:
         type: string
       id:
         type: integer
-      isDeleted:
-        type: boolean
       name:
         type: string
       patronymic:
@@ -65,6 +61,16 @@ definitions:
       phonenumber:
         type: string
       surname:
+        type: string
+    type: object
+  models.DictionaryItem:
+    description: Универсальный элемент справочника (используется для всех типов справочников)
+    properties:
+      id:
+        type: integer
+      isdeleted:
+        type: boolean
+      name:
         type: string
     type: object
   models.Document:
@@ -91,8 +97,8 @@ definitions:
         type: integer
       startDate:
         type: string
-      status:
-        type: boolean
+    required:
+    - loadEmpId
     type: object
   models.Employee:
     properties:
@@ -118,11 +124,13 @@ definitions:
         type: string
       surname:
         type: string
+    required:
+    - jobpositionid
     type: object
   models.Order:
     properties:
-      addressid:
-        type: integer
+      address:
+        type: string
       clientid:
         type: integer
       comment:
@@ -137,8 +145,6 @@ definitions:
         type: string
       id:
         type: integer
-      isDeleted:
-        type: boolean
       ispay:
         type: boolean
       name:
@@ -146,9 +152,12 @@ definitions:
       respempid:
         type: integer
       statusid:
-        type: string
+        type: integer
       sumorder:
         type: number
+    required:
+    - clientid
+    - statusid
     type: object
   models.Payment:
     properties:
@@ -160,8 +169,14 @@ definitions:
         type: integer
       paytypeid:
         type: integer
+      statusid:
+        type: integer
       sum:
         type: number
+    required:
+    - orderid
+    - paytypeid
+    - statusid
     type: object
   models.Product:
     properties:
@@ -174,17 +189,14 @@ definitions:
       cost:
         type: number
       counttypepack:
-        description: Packaged      int     `gorm:"column:packaged" json:"packaged"`
         type: integer
       description:
         type: string
       fats:
         type: number
       id:
-        description: gorm.Model
         type: integer
       instore:
-        description: OkeiId        int     `gorm:"column:okeiid" json:"okeiId"`
         type: boolean
       name:
         type: string
@@ -196,6 +208,15 @@ definitions:
         type: number
       weight:
         type: integer
+    required:
+    - calories
+    - carbohydrates
+    - categoryid
+    - cost
+    - fats
+    - proteins
+    - unweight
+    - weight
     type: object
   models.ProductInBasket:
     properties:
@@ -204,6 +225,22 @@ definitions:
       count:
         type: integer
       productid:
+        type: integer
+    required:
+    - clientid
+    - count
+    - productid
+    type: object
+  models.StatusInput:
+    properties:
+      statusid:
+        type: integer
+    required:
+    - statusid
+    type: object
+  models.StatusResponse:
+    properties:
+      statusid:
         type: integer
     type: object
 host: localhost
@@ -246,7 +283,7 @@ paths:
               type: string
             type: object
       security:
-      - Bearer: []
+      - BearerAuth: []
       summary: Добавить товар в корзину клиента
       tags:
       - Basket
@@ -280,7 +317,7 @@ paths:
               type: string
             type: object
       security:
-      - Bearer: []
+      - BearerAuth: []
       summary: Получить корзину клиента
       tags:
       - Basket
@@ -313,7 +350,7 @@ paths:
               type: string
             type: object
       security:
-      - Bearer: []
+      - BearerAuth: []
       summary: Удалить товар из корзины клиента
       tags:
       - Basket
@@ -485,6 +522,120 @@ paths:
       summary: Обновить данные клиента
       tags:
       - Client
+  /dict/{dict}:
+    get:
+      description: Возвращает все не удалённые элементы справочника (isDeleted = false)
+      parameters:
+      - description: 'Тип справочника (например: position, accessGroup, subcategoryProduct,
+          statuses, paymentType)'
+        in: path
+        name: dict
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.DictionaryItem'
+            type: array
+        "400":
+          description: неверный тип справочника
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: внутренняя ошибка сервера
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Получить элементы справочника
+      tags:
+      - Dictionary
+    post:
+      consumes:
+      - application/json
+      description: Добавляет новый элемент в указанный справочник
+      parameters:
+      - description: Тип справочника
+        in: path
+        name: dict
+        required: true
+        type: string
+      - description: Элемент справочника
+        in: body
+        name: item
+        required: true
+        schema:
+          $ref: '#/definitions/models.DictionaryItem'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.DictionaryItem'
+        "400":
+          description: неверный тип справочника
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: внутренняя ошибка сервера
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Создать элемент справочника
+      tags:
+      - Dictionary
+  /dict/{dict}/{id}:
+    delete:
+      description: Помечает элемент как удалённый (isDeleted = true)
+      parameters:
+      - description: Тип справочника
+        in: path
+        name: dict
+        required: true
+        type: string
+      - description: ID элемента
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: элемент справочника удалён
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: неверный тип справочника
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: внутренняя ошибка сервера
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Удалить элемент справочника
+      tags:
+      - Dictionary
   /documents:
     get:
       produces:
@@ -502,12 +653,13 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Получить все документы
       tags:
       - Documents
     post:
       consumes:
-      - application/json
       - application/json
       parameters:
       - description: Новый документ
@@ -516,14 +668,7 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/models.Document'
-      - description: Новый документ
-        in: body
-        name: document
-        required: true
-        schema:
-          $ref: '#/definitions/models.Document'
       produces:
-      - application/json
       - application/json
       responses:
         "201":
@@ -542,9 +687,10 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Создать документ
       tags:
-      - Documents
       - Documents
   /documents/{id}:
     delete:
@@ -575,6 +721,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Удалить документ
       tags:
       - Documents
@@ -604,6 +752,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Получить документ по ID
       tags:
       - Documents
@@ -647,7 +797,51 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Обновить документ по ID
+      tags:
+      - Documents
+  /documents/{id}/submit:
+    put:
+      description: Устанавливает поле issubmit = true для документа, если он существует
+        и не удалён (status = true)
+      parameters:
+      - description: ID документа
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: документ подписан
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: неверный ID или попытка подписать удалённый документ
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: документ не найден
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: ошибка сервера при подписании документа
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Подписать документ
       tags:
       - Documents
   /employees:
@@ -715,6 +909,12 @@ paths:
             additionalProperties:
               type: string
             type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
       security:
       - BearerAuth: []
       summary: Удалить сотрудника
@@ -736,6 +936,12 @@ paths:
             $ref: '#/definitions/models.Employee'
         "404":
           description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
           schema:
             additionalProperties:
               type: string
@@ -784,6 +990,48 @@ paths:
       summary: Обновить сотрудника
       tags:
       - Employees
+  /employees/{id}/fire:
+    put:
+      consumes:
+      - application/json
+      description: Устанавливает поле enddate текущей датой для сотрудника с заданным
+        ID
+      parameters:
+      - description: ID сотрудника
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Employee'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Уволить сотрудника
+      tags:
+      - employees
   /login:
     post:
       consumes:
@@ -824,6 +1072,8 @@ paths:
             items:
               $ref: '#/definitions/models.Order'
             type: array
+      security:
+      - BearerAuth: []
       summary: Получить все заказы
       tags:
       - Orders
@@ -856,6 +1106,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Создать заказ
       tags:
       - Orders
@@ -880,6 +1132,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Удалить заказ
       tags:
       - Orders
@@ -903,6 +1157,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Получить заказ по ID
       tags:
       - Orders
@@ -940,9 +1196,92 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Обновить заказ
       tags:
       - Orders
+  /orders/{id}/status:
+    get:
+      consumes:
+      - application/json
+      description: Получает поле statusid заказа по ID
+      parameters:
+      - description: ID заказа
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StatusResponse'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Получить статус заказа
+      tags:
+      - orders
+    put:
+      consumes:
+      - application/json
+      description: Обновляет поле statusid заказа по ID
+      parameters:
+      - description: ID заказа
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Новый статус
+        in: body
+        name: status
+        required: true
+        schema:
+          $ref: '#/definitions/models.StatusInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Order'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Обновить статус заказа
+      tags:
+      - orders
   /payments:
     get:
       produces:
@@ -960,6 +1299,8 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Получить все платежи
       tags:
       - Payments
@@ -992,9 +1333,92 @@ paths:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Провести оплату по заказу
       tags:
       - Payments
+  /payments/{id}/status:
+    get:
+      consumes:
+      - application/json
+      description: Получает поле statusid платежа по ID
+      parameters:
+      - description: ID платежа
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.StatusResponse'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Получить статус платежа
+      tags:
+      - payments
+    put:
+      consumes:
+      - application/json
+      description: Обновляет поле statusid платежа по ID
+      parameters:
+      - description: ID платежа
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Новый статус
+        in: body
+        name: status
+        required: true
+        schema:
+          $ref: '#/definitions/models.StatusInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Payment'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Обновить статус платежа
+      tags:
+      - payments
   /payments/order/{orderId}:
     get:
       parameters:
@@ -1003,13 +1427,7 @@ paths:
         name: orderId
         required: true
         type: integer
-      - description: ID заказа
-        in: path
-        name: orderId
-        required: true
-        type: integer
       produces:
-      - application/json
       - application/json
       responses:
         "200":
@@ -1041,7 +1459,6 @@ paths:
       summary: Получить платежи клиента по ID заказа
       tags:
       - Payments
-      - Payments
   /products:
     get:
       consumes:
@@ -1061,8 +1478,6 @@ paths:
             additionalProperties:
               type: string
             type: object
-      security:
-      - BearerAuth: []
       summary: Получить список продуктов
       tags:
       - Products
@@ -1097,7 +1512,6 @@ paths:
               type: string
             type: object
       security:
-      - BearerAuth: []
       - BearerAuth: []
       summary: Добавить продукт (только для admin и manager)
       tags:
@@ -1150,8 +1564,6 @@ paths:
             additionalProperties:
               type: string
             type: object
-      security:
-      - BearerAuth: []
       summary: Получение продукта по ID
       tags:
       - Products
@@ -1357,6 +1769,93 @@ paths:
       summary: Обновить пользователя
       tags:
       - Users
+  /users/{id}/access-groups:
+    get:
+      consumes:
+      - application/json
+      description: Возвращает список групп доступа для пользователя по ID
+      parameters:
+      - description: ID пользователя
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: список ID групп доступа
+          schema:
+            items:
+              type: integer
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Получить группы доступа пользователя
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Заменяет все группы доступа пользователя новыми (полная замена)
+      parameters:
+      - description: ID пользователя
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Список ID групп доступа
+        in: body
+        name: groups
+        required: true
+        schema:
+          items:
+            type: integer
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Назначить группы доступа пользователю
+      tags:
+      - users
 schemes:
 - https
 securityDefinitions:

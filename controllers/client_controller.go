@@ -20,7 +20,7 @@ import (
 func GetAllClients(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var clients []models.Client
-		if err := db.Where("is_deleted = ?", false).Find(&clients).Error; err != nil {
+		if err := db.Where("isdeleted = ?", false).Find(&clients).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "не удалось получить клиентов"})
 			return
 		}
@@ -42,7 +42,7 @@ func GetClientByID(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 		var client models.Client
-		if err := db.Where("id = ? AND is_deleted = ?", id, false).First(&client).Error; err != nil {
+		if err := db.Where("id = ? AND isdeleted = ?", id, false).First(&client).Error; err != nil {
 			c.JSON(http.StatusNotFound, gin.H{"error": "клиент не найден"})
 			return
 		}
@@ -96,7 +96,7 @@ func UpdateClient(db *gorm.DB) gin.HandlerFunc {
 		var client models.Client
 		id := c.Param("id")
 
-		if err := db.Where("id = ? AND is_deleted = ?", id, false).First(&client).Error; err != nil {
+		if err := db.Where("id = ? AND isdeleted = ?", id, false).First(&client).Error; err != nil {
 			c.JSON(http.StatusNotFound, gin.H{"error": "клиент не найден"})
 			return
 		}
@@ -106,8 +106,8 @@ func UpdateClient(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		delete(input, "id")        // не обновлять ID
-		delete(input, "isDeleted") // не обновлять флаг удаления напрямую
+		delete(input, "id")
+		delete(input, "isdeleted")
 
 		if err := db.Model(&client).Updates(input).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "не удалось обновить клиента"})
@@ -132,8 +132,13 @@ func DeleteClient(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 		var client models.Client
-		if err := db.Where("id = ? AND is_deleted = ?", id, false).First(&client).Error; err != nil {
+		if err := db.Where("id = ? AND isdeleted = ?", id, false).First(&client).Error; err != nil {
 			c.JSON(http.StatusNotFound, gin.H{"error": "клиент не найден"})
+			return
+		}
+
+		if !client.IsDeleted {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "клиент уже удалён"})
 			return
 		}
 

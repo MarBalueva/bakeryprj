@@ -1,2 +1,87 @@
 {"level":"info","msg":"Запуск приложения","time":"2025-05-24T14:37:16Z"}
 {"level":"info","msg":"ENV: development, PORT: 8080","time":"2025-05-24T14:37:16Z"}
+{"level":"info","msg":"Запуск приложения","time":"2025-05-25T21:42:28Z"}
+{"level":"info","msg":"ENV: development, PORT: 8080","time":"2025-05-25T21:42:28Z"}
+{"level":"info","msg":"No new migrations to apply","time":"2025-05-25T21:42:28Z"}
+{"level":"info","msg":"DB connected and migrated successfully","time":"2025-05-25T21:42:28Z"}
+{"level":"info","msg":"Starting server on port:8080","time":"2025-05-25T21:42:28Z"}
+{"level":"info","msg":"Запуск приложения","time":"2025-05-28T17:13:08Z"}
+{"level":"info","msg":"ENV: development, PORT: 8080","time":"2025-05-28T17:13:08Z"}
+{"level":"fatal","msg":"Auto migration failed: ERROR: constraint \"uni_appusers_login\" of relation \"appusers\" does not exist (SQLSTATE 42704)","time":"2025-05-28T17:13:09Z"}
+{"level":"info","msg":"Запуск приложения","time":"2025-05-28T17:24:17Z"}
+{"level":"info","msg":"ENV: development, PORT: 8080","time":"2025-05-28T17:24:17Z"}
+{"level":"fatal","msg":"Auto migration failed: ERROR: constraint \"uni_appusers_login\" of relation \"appusers\" does not exist (SQLSTATE 42704)","time":"2025-05-28T17:24:17Z"}
+{"level":"info","msg":"Запуск приложения","time":"2025-05-28T17:27:14Z"}
+{"level":"info","msg":"ENV: development, PORT: 8080","time":"2025-05-28T17:27:14Z"}
+{"level":"fatal","msg":"Auto migration failed: ERROR: constraint \"uni_appusers_login\" of relation \"appusers\" does not exist (SQLSTATE 42704)","time":"2025-05-28T17:27:14Z"}
+{"level":"info","msg":"Запуск приложения","time":"2025-05-28T17:29:11Z"}
+{"level":"info","msg":"ENV: development, PORT: 8080","time":"2025-05-28T17:29:11Z"}
+{"level":"error","msg":"DB connection attempt 1 failed: failed to connect to `user=postgres database=bakery`: 172.20.0.2:5432 (db): dial error: dial tcp 172.20.0.2:5432: connect: connection refused","time":"2025-05-28T17:29:11Z"}
+{"level":"error","msg":"DB connection attempt 2 failed: failed to connect to `user=postgres database=bakery`: 172.20.0.2:5432 (db): dial error: dial tcp 172.20.0.2:5432: connect: connection refused","time":"2025-05-28T17:29:13Z"}
+{"level":"error","msg":"DB connection attempt 3 failed: failed to connect to `user=postgres database=bakery`: 172.20.0.2:5432 (db): dial error: dial tcp 172.20.0.2:5432: connect: connection refused","time":"2025-05-28T17:29:15Z"}
+{"level":"fatal","msg":"Auto migration failed: ERROR: no schema has been selected to create in (SQLSTATE 3F000)","time":"2025-05-28T17:29:17Z"}
+{"level":"info","msg":"Запуск приложения","time":"2025-05-28T17:41:25Z"}
+{"level":"info","msg":"ENV: development, PORT: 8080","time":"2025-05-28T17:41:25Z"}
+{"level":"fatal","msg":"Auto migration failed: ERROR: duplicate key value violates unique constraint \"pg_class_relname_nsp_index\" (SQLSTATE 23505)","time":"2025-05-28T17:41:25Z"}
+{"level":"info","msg":"Запуск приложения","time":"2025-05-28T17:44:51Z"}
+{"level":"info","msg":"ENV: development, PORT: 8080","time":"2025-05-28T17:44:51Z"}
+{"level":"error","msg":"DB connection attempt 1 failed: failed to connect to `user=postgres database=bakery`: 172.20.0.2:5432 (db): dial error: dial tcp 172.20.0.2:5432: connect: connection refused","time":"2025-05-28T17:44:51Z"}
+{"level":"error","msg":"DB connection attempt 2 failed: failed to connect to `user=postgres database=bakery`: 172.20.0.2:5432 (db): dial error: dial tcp 172.20.0.2:5432: connect: connection refused","time":"2025-05-28T17:44:53Z"}
+{"level":"info","msg":"DB connected and schema auto-migrated","time":"2025-05-28T17:44:55Z"}
+{"level":"info","msg":"Starting server on port:8080","time":"2025-05-28T17:44:55Z"}
+{"level":"info","msg":"Запуск приложения","time":"2025-05-28T18:09:33Z"}
+{"level":"info","msg":"ENV: development, PORT: 8080","time":"2025-05-28T18:09:33Z"}
+{"level":"info","msg":"DB connected and schema auto-migrated","time":"2025-05-28T18:09:34Z"}
+{"level":"info","msg":"Starting server on port:8080","time":"2025-05-28T18:09:34Z"}
+{"level":"info","msg":"Запуск приложения","time":"2025-05-28T18:11:27Z"}
+{"level":"info","msg":"ENV: development, PORT: 8080","time":"2025-05-28T18:11:27Z"}
+{"level":"info","msg":"DB connected and schema auto-migrated","time":"2025-05-28T18:11:27Z"}
+{"level":"info","msg":"Starting server on port:8080","time":"2025-05-28T18:11:27Z"}
+{"level":"info","msg":"Запуск приложения","time":"2025-05-28T18:22:48Z"}
+{"level":"info","msg":"ENV: development, PORT: 8080","time":"2025-05-28T18:22:48Z"}
+{"level":"info","msg":"DB connected and schema auto-migrated","time":"2025-05-28T18:22:48Z"}
+{"level":"info","msg":"Starting server on port:8080","time":"2025-05-28T18:22:48Z"}
+{"level":"info","msg":"Запуск приложения","time":"2025-05-28T18:28:46Z"}
+{"level":"info","msg":"ENV: development, PORT: 8080","time":"2025-05-28T18:28:46Z"}
+{"level":"info","msg":"DB connected and schema auto-migrated","time":"2025-05-28T18:28:46Z"}
+{"level":"info","msg":"Starting server on port:8080","time":"2025-05-28T18:28:46Z"}
+{"level":"info","msg":"Запуск приложения","time":"2025-05-28T18:38:44Z"}
+{"level":"info","msg":"ENV: development, PORT: 8080","time":"2025-05-28T18:38:44Z"}
+{"level":"info","msg":"DB connected and schema auto-migrated","time":"2025-05-28T18:38:45Z"}
+{"level":"info","msg":"Starting server on port:8080","time":"2025-05-28T18:38:45Z"}
+{"level":"info","msg":"Запуск приложения","time":"2025-05-28T18:46:35Z"}
+{"level":"info","msg":"ENV: development, PORT: 8080","time":"2025-05-28T18:46:35Z"}
+{"level":"info","msg":"DB connected and schema auto-migrated","time":"2025-05-28T18:46:35Z"}
+{"level":"info","msg":"Starting server on port:8080","time":"2025-05-28T18:46:35Z"}
+{"level":"info","msg":"Запуск приложения","time":"2025-05-28T18:57:25Z"}
+{"level":"info","msg":"ENV: development, PORT: 8080","time":"2025-05-28T18:57:25Z"}
+{"level":"info","msg":"DB connected and schema auto-migrated","time":"2025-05-28T18:57:26Z"}
+{"level":"info","msg":"Starting server on port:8080","time":"2025-05-28T18:57:26Z"}
+{"level":"info","msg":"Запуск приложения","time":"2025-05-28T19:02:51Z"}
+{"level":"info","msg":"ENV: development, PORT: 8080","time":"2025-05-28T19:02:51Z"}
+{"level":"info","msg":"DB connected and schema auto-migrated","time":"2025-05-28T19:02:51Z"}
+{"level":"info","msg":"Starting server on port:8080","time":"2025-05-28T19:02:51Z"}
+{"level":"info","msg":"Запуск приложения","time":"2025-05-28T19:23:57Z"}
+{"level":"info","msg":"ENV: development, PORT: 8080","time":"2025-05-28T19:23:57Z"}
+{"level":"info","msg":"DB connected and schema auto-migrated","time":"2025-05-28T19:23:57Z"}
+{"level":"info","msg":"Starting server on port:8080","time":"2025-05-28T19:23:57Z"}
+{"level":"info","msg":"Запуск приложения","time":"2025-05-28T19:33:35Z"}
+{"level":"info","msg":"ENV: development, PORT: 8080","time":"2025-05-28T19:33:35Z"}
+{"level":"info","msg":"DB connected and schema auto-migrated","time":"2025-05-28T19:33:35Z"}
+{"level":"info","msg":"Starting server on port:8080","time":"2025-05-28T19:33:35Z"}
+{"level":"info","msg":"Запуск приложения","time":"2025-05-28T19:43:33Z"}
+{"level":"info","msg":"ENV: development, PORT: 8080","time":"2025-05-28T19:43:33Z"}
+{"level":"info","msg":"DB connected and schema auto-migrated","time":"2025-05-28T19:43:33Z"}
+{"level":"info","msg":"Starting server on port:8080","time":"2025-05-28T19:43:33Z"}
+{"level":"info","msg":"Запуск приложения","time":"2025-05-28T20:34:58Z"}
+{"level":"info","msg":"ENV: development, PORT: 8080","time":"2025-05-28T20:34:58Z"}
+{"level":"info","msg":"DB connected and schema auto-migrated","time":"2025-05-28T20:34:59Z"}
+{"level":"info","msg":"Starting server on port:8080","time":"2025-05-28T20:34:59Z"}
+{"level":"info","msg":"Запуск приложения","time":"2025-05-28T20:39:47Z"}
+{"level":"info","msg":"ENV: development, PORT: 8080","time":"2025-05-28T20:39:47Z"}
+{"level":"info","msg":"DB connected and schema auto-migrated","time":"2025-05-28T20:39:48Z"}
+{"level":"info","msg":"Starting server on port:8080","time":"2025-05-28T20:39:48Z"}
+{"level":"info","msg":"Запуск приложения","time":"2025-05-28T21:56:02Z"}
+{"level":"info","msg":"ENV: development, PORT: 8080","time":"2025-05-28T21:56:02Z"}
+{"level":"info","msg":"DB connected and schema auto-migrated","time":"2025-05-28T21:56:03Z"}
+{"level":"info","msg":"Starting server on port:8080","time":"2025-05-28T21:56:03Z"}
