@@ -61,7 +61,7 @@ func RegisterOrderRoutes(router *gin.Engine, db *gorm.DB) {
 	orders := router.Group("/orders")
 	{
 		orders.POST("", middleware.RoleMiddleware(db, "admin", "manager", "client"), controllers.CreateOrder(db))
-		orders.GET("", middleware.RoleMiddleware(db, "admin", "manager", "client"), controllers.GetAllOrders(db))
+		orders.GET("", middleware.RoleMiddleware(db, "admin", "manager"), controllers.GetAllOrders(db))
 		orders.GET("/:id", middleware.RoleMiddleware(db, "admin", "manager", "client"), controllers.GetOrderById(db))
 		orders.GET("/:id/status", middleware.RoleMiddleware(db, "admin", "manager", "client"), controllers.GetOrderStatus(db))
 		orders.PUT("/:id", middleware.RoleMiddleware(db, "admin", "manager", "client"), controllers.UpdateOrder(db))

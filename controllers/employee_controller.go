@@ -186,7 +186,7 @@ func GetEmployeeById(db *gorm.DB) gin.HandlerFunc {
 
 // @Summary Уволить сотрудника
 // @Description Устанавливает поле enddate текущей датой для сотрудника с заданным ID
-// @Tags employees
+// @Tags Employees
 // @Accept json
 // @Produce json
 // @Param id path int true "ID сотрудника"

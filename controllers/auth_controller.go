@@ -79,7 +79,6 @@ func Register(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		// После успешного создания пользователя:
 		accessSQL := `INSERT INTO user_accesses (userid, groupid) VALUES (?, ?)`
 		if err := db.Exec(accessSQL, user.ID, 1).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "не удалось назначить группу доступа"})

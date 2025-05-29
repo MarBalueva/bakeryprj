@@ -1031,7 +1031,7 @@ paths:
       - BearerAuth: []
       summary: Уволить сотрудника
       tags:
-      - employees
+      - Employees
   /login:
     post:
       consumes:
@@ -1235,7 +1235,7 @@ paths:
       - BearerAuth: []
       summary: Получить статус заказа
       tags:
-      - orders
+      - Orders
     put:
       consumes:
       - application/json
@@ -1281,7 +1281,7 @@ paths:
       - BearerAuth: []
       summary: Обновить статус заказа
       tags:
-      - orders
+      - Orders
   /payments:
     get:
       produces:
@@ -1372,7 +1372,7 @@ paths:
       - BearerAuth: []
       summary: Получить статус платежа
       tags:
-      - payments
+      - Payments
     put:
       consumes:
       - application/json
@@ -1418,7 +1418,7 @@ paths:
       - BearerAuth: []
       summary: Обновить статус платежа
       tags:
-      - payments
+      - Payments
   /payments/order/{orderId}:
     get:
       parameters:
@@ -1463,21 +1463,29 @@ paths:
     get:
       consumes:
       - application/json
-      description: Получить список продуктов
+      description: Получить список продуктов, с возможной фильтрацией по категории
+      parameters:
+      - description: ID категории для фильтрации
+        in: query
+        name: categoryid
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: Список продуктов
           schema:
-            additionalProperties: true
-            type: object
+            items:
+              $ref: '#/definitions/models.Product'
+            type: array
         "500":
           description: Ошибка сервера
           schema:
             additionalProperties:
               type: string
             type: object
+      security:
+      - BearerAuth: []
       summary: Получить список продуктов
       tags:
       - Products
@@ -1805,7 +1813,7 @@ paths:
       - BearerAuth: []
       summary: Получить группы доступа пользователя
       tags:
-      - users
+      - Users
     put:
       consumes:
       - application/json
@@ -1855,7 +1863,7 @@ paths:
       - BearerAuth: []
       summary: Назначить группы доступа пользователю
       tags:
-      - users
+      - Users
 schemes:
 - https
 securityDefinitions:

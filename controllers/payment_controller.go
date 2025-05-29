@@ -135,7 +135,7 @@ func GetPaymentsByOrder(db *gorm.DB) gin.HandlerFunc {
 
 // @Summary Получить статус платежа
 // @Description Получает поле statusid платежа по ID
-// @Tags payments
+// @Tags Payments
 // @Accept json
 // @Produce json
 // @Param id path int true "ID платежа"
@@ -160,7 +160,7 @@ func GetPaymentStatus(db *gorm.DB) gin.HandlerFunc {
 
 // @Summary Обновить статус платежа
 // @Description Обновляет поле statusid платежа по ID
-// @Tags payments
+// @Tags Payments
 // @Accept json
 // @Produce json
 // @Param id path int true "ID платежа"

@@ -205,7 +205,7 @@ func GetUserByID(db *gorm.DB) gin.HandlerFunc {
 
 // @Summary Получить группы доступа пользователя
 // @Description Возвращает список групп доступа для пользователя по ID
-// @Tags users
+// @Tags Users
 // @Accept json
 // @Produce json
 // @Param id path int true "ID пользователя"
@@ -241,7 +241,7 @@ func GetUserAccessGroups(db *gorm.DB) gin.HandlerFunc {
 
 // @Summary Назначить группы доступа пользователю
 // @Description Заменяет все группы доступа пользователя новыми (полная замена)
-// @Tags users
+// @Tags Users
 // @Accept json
 // @Produce json
 // @Param id path int true "ID пользователя"

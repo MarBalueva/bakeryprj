@@ -3,6 +3,7 @@ package controllers
 import (
 	"bakeryapp/models"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -11,20 +12,34 @@ import (
 
 // GetProducts godoc
 // @Summary Получить список продуктов
-// @Description Получить список продуктов
+// @Description Получить список продуктов, с возможной фильтрацией по категории
 // @Tags Products
 // @Accept json
 // @Produce json
-// @Success 200 {object} map[string]interface{} "Список продуктов"
+// @Param categoryid query int false "ID категории для фильтрации"
+// @Success 200 {array} models.Product "Список продуктов"
 // @Failure 500 {object} map[string]string "Ошибка сервера"
 // @Router /products [get]
+// @Security BearerAuth
 func GetProducts(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var products []models.Product
-		if err := db.Where("isdeleted = false").Find(&products).Error; err != nil {
+		query := db.Where("isdeleted = false")
+
+		if categoryIdStr := c.Query("categoryid"); categoryIdStr != "" {
+			if categoryId, err := strconv.ParseInt(categoryIdStr, 10, 64); err == nil && categoryId > 0 {
+				query = query.Where("categoryid = ?", categoryId)
+			} else {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "Неверный categoryid"})
+				return
+			}
+		}
+
+		if err := query.Find(&products).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
+
 		c.JSON(http.StatusOK, products)
 	}
 }

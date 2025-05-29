@@ -22,15 +22,56 @@ import (
 // @Security BearerAuth
 func CreateOrder(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var order models.Order
-		if err := c.ShouldBindJSON(&order); err != nil {
+		var input map[string]interface{}
+		if err := c.ShouldBindJSON(&input); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		order.ID = 0
-		order.CreateDate = time.Now()
-		order.IsPay = false
+		delete(input, "id")
+		delete(input, "ispay")
+		delete(input, "respempid")
+		delete(input, "sumorder")
+		delete(input, "createdate")
+
+		order := models.Order{
+			CreateDate: time.Now(),
+			IsPay:      false,
+		}
+
+		if v, ok := input["name"].(string); ok {
+			order.Name = v
+		}
+		if v, ok := input["clientid"].(float64); ok {
+			order.ClientId = int64(v)
+		}
+		if v, ok := input["address"].(string); ok {
+			order.Address = v
+		}
+		if v, ok := input["statusid"].(float64); ok {
+			order.StatusId = int64(v)
+		}
+		if v, ok := input["comment"].(string); ok {
+			order.Comment = &v
+		}
+		if v, ok := input["enddate"].(string); ok && v != "" {
+			t, err := time.Parse(time.RFC3339, v)
+			if err == nil {
+				order.EndDate = &t
+			}
+		}
+		if v, ok := input["delstartdate"].(string); ok && v != "" {
+			t, err := time.Parse(time.RFC3339, v)
+			if err == nil {
+				order.DelStartDate = &t
+			}
+		}
+		if v, ok := input["delenddate"].(string); ok && v != "" {
+			t, err := time.Parse(time.RFC3339, v)
+			if err == nil {
+				order.DelEndDate = &t
+			}
+		}
 
 		var basketItems []models.ProductInBasket
 		if err := db.Where("clientid = ?", order.ClientId).Find(&basketItems).Error; err != nil {
@@ -42,27 +83,36 @@ func CreateOrder(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		if err := db.Create(&order).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "не удалось создать заказ"})
-			return
-		}
-
+		var totalSum float64
 		var orderItems []models.ProductInOrder
+
 		for _, item := range basketItems {
 			var product models.Product
 			if err := db.First(&product, item.ProductID).Error; err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "не удалось получить информацию о товаре"})
 				return
 			}
+			itemSum := product.Cost * float64(item.Count)
+			totalSum += itemSum
 
 			orderItems = append(orderItems, models.ProductInOrder{
 				ProductID: item.ProductID,
-				OrderID:   order.ID,
+				OrderID:   0,
 				Count:     item.Count,
 				Cost:      product.Cost,
 			})
 		}
 
+		order.SumOrder = totalSum
+
+		if err := db.Create(&order).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "не удалось создать заказ"})
+			return
+		}
+
+		for i := range orderItems {
+			orderItems[i].OrderID = order.ID
+		}
 		if err := db.Create(&orderItems).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "не удалось сохранить товары заказа"})
 			return
@@ -216,7 +266,7 @@ func DeleteOrder(db *gorm.DB) gin.HandlerFunc {
 
 // @Summary Получить статус заказа
 // @Description Получает поле statusid заказа по ID
-// @Tags orders
+// @Tags Orders
 // @Accept json
 // @Produce json
 // @Param id path int true "ID заказа"
@@ -241,7 +291,7 @@ func GetOrderStatus(db *gorm.DB) gin.HandlerFunc {
 
 // @Summary Обновить статус заказа
 // @Description Обновляет поле statusid заказа по ID
-// @Tags orders
+// @Tags Orders
 // @Accept json
 // @Produce json
 // @Param id path int true "ID заказа"

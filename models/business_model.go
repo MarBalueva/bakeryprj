@@ -17,7 +17,7 @@ type Product struct {
 	Cost          float64 `gorm:"column:cost" json:"cost" binding:"required,gt=0"`
 	InStore       bool    `gorm:"column:instore" json:"instore"`
 	PhotoLink     string  `gorm:"column:photolink" json:"photolink"`
-	IsDeleted     bool    `gorm:"column:isdeleted" json:"-"`
+	IsDeleted     bool    `gorm:"column:isdeleted;default:false" json:"-"`
 }
 
 type PriceHistory struct {
@@ -39,7 +39,7 @@ type Employee struct {
 	PositionID int64      `gorm:"column:jobpositionid" json:"jobpositionid" binding:"required,gt=0"`
 	Number     string     `gorm:"column:number" json:"number"`
 	PhotoLink  *string    `gorm:"column:photolink" json:"photolink"`
-	IsDeleted  bool       `gorm:"column:isdeleted" json:"-"`
+	IsDeleted  bool       `gorm:"column:isdeleted;default:false" json:"-"`
 }
 
 type Order struct {
@@ -51,12 +51,12 @@ type Order struct {
 	StatusId     int64      `gorm:"column:statusid" json:"statusid" binding:"required,gt=0"`
 	CreateDate   time.Time  `gorm:"column:createdate" json:"createdate"`
 	SumOrder     float64    `gorm:"column:sumorder" json:"sumorder"`
-	IsPay        bool       `gorm:"column:ispay" json:"ispay"`
+	IsPay        bool       `gorm:"column:ispay;default:false" json:"ispay"`
 	Comment      *string    `gorm:"column:comment" json:"comment"`
 	EndDate      *time.Time `gorm:"column:enddate" json:"enddate"`
 	DelStartDate *time.Time `gorm:"column:delstartdate" json:"delstartdate"`
 	DelEndDate   *time.Time `gorm:"column:delenddate" json:"delenddate"`
-	IsDeleted    bool       `gorm:"column:isdeleted" json:"-"`
+	IsDeleted    bool       `gorm:"column:isdeleted;default:false" json:"-"`
 }
 
 type Client struct {

@@ -82,7 +82,7 @@ func CreateDocument(db *gorm.DB) gin.HandlerFunc {
 func GetAllDocuments(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var docs []models.Document
-		if err := db.Where("isdeleted = ?", false).Find(&docs).Error; err != nil {
+		if err := db.Where("status = ?", true).Find(&docs).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "не удалось получить документы"})
 			return
 		}
@@ -103,7 +103,7 @@ func GetDocumentByID(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 		var doc models.Document
-		if err := db.Where("id = ? AND isdeleted = ?", id, false).First(&doc).Error; err != nil {
+		if err := db.Where("id = ? AND status = ?", id, true).First(&doc).Error; err != nil {
 			c.JSON(http.StatusNotFound, gin.H{"error": "документ не найден"})
 			return
 		}

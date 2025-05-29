@@ -1197,7 +1197,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "employees"
+                    "Employees"
                 ],
                 "summary": "Уволить сотрудника",
                 "parameters": [
@@ -1530,7 +1530,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "orders"
+                    "Orders"
                 ],
                 "summary": "Получить статус заказа",
                 "parameters": [
@@ -1583,7 +1583,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "orders"
+                    "Orders"
                 ],
                 "summary": "Обновить статус заказа",
                 "parameters": [
@@ -1809,7 +1809,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "payments"
+                    "Payments"
                 ],
                 "summary": "Получить статус платежа",
                 "parameters": [
@@ -1862,7 +1862,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "payments"
+                    "Payments"
                 ],
                 "summary": "Обновить статус платежа",
                 "parameters": [
@@ -1922,7 +1922,12 @@ const docTemplate = `{
         },
         "/products": {
             "get": {
-                "description": "Получить список продуктов",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Получить список продуктов, с возможной фильтрацией по категории",
                 "consumes": [
                     "application/json"
                 ],
@@ -1933,12 +1938,22 @@ const docTemplate = `{
                     "Products"
                 ],
                 "summary": "Получить список продуктов",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID категории для фильтрации",
+                        "name": "categoryid",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Список продуктов",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Product"
+                            }
                         }
                     },
                     "500": {
@@ -2425,7 +2440,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "users"
+                    "Users"
                 ],
                 "summary": "Получить группы доступа пользователя",
                 "parameters": [
@@ -2481,7 +2496,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "users"
+                    "Users"
                 ],
                 "summary": "Назначить группы доступа пользователю",
                 "parameters": [

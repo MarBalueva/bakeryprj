@@ -1194,7 +1194,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "employees"
+                    "Employees"
                 ],
                 "summary": "Уволить сотрудника",
                 "parameters": [
@@ -1527,7 +1527,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "orders"
+                    "Orders"
                 ],
                 "summary": "Получить статус заказа",
                 "parameters": [
@@ -1580,7 +1580,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "orders"
+                    "Orders"
                 ],
                 "summary": "Обновить статус заказа",
                 "parameters": [
@@ -1806,7 +1806,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "payments"
+                    "Payments"
                 ],
                 "summary": "Получить статус платежа",
                 "parameters": [
@@ -1859,7 +1859,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "payments"
+                    "Payments"
                 ],
                 "summary": "Обновить статус платежа",
                 "parameters": [
@@ -1919,7 +1919,12 @@
         },
         "/products": {
             "get": {
-                "description": "Получить список продуктов",
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Получить список продуктов, с возможной фильтрацией по категории",
                 "consumes": [
                     "application/json"
                 ],
@@ -1930,12 +1935,22 @@
                     "Products"
                 ],
                 "summary": "Получить список продуктов",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID категории для фильтрации",
+                        "name": "categoryid",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Список продуктов",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Product"
+                            }
                         }
                     },
                     "500": {
@@ -2422,7 +2437,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "users"
+                    "Users"
                 ],
                 "summary": "Получить группы доступа пользователя",
                 "parameters": [
@@ -2478,7 +2493,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "users"
+                    "Users"
                 ],
                 "summary": "Назначить группы доступа пользователю",
                 "parameters": [
