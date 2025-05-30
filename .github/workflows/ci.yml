@@ -47,7 +47,7 @@ jobs:
 
       - name: Run AutoMigrate (GORM)
         run: |
-          go run ./cmd/migrate/main.go
+          go run ./cmd/main.go
 
       - name: Build Go app
         run: |
