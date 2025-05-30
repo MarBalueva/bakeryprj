@@ -106,3 +106,7 @@
 {"level":"info","msg":"ENV: development, PORT: 8080","time":"2025-05-29T20:25:19Z"}
 {"level":"info","msg":"DB connected and schema auto-migrated","time":"2025-05-29T20:25:20Z"}
 {"level":"info","msg":"Starting server on port:8080","time":"2025-05-29T20:25:20Z"}
+{"level":"info","msg":"Запуск приложения","time":"2025-05-29T20:37:32Z"}
+{"level":"info","msg":"ENV: development, PORT: 8080","time":"2025-05-29T20:37:32Z"}
+{"level":"info","msg":"DB connected and schema auto-migrated","time":"2025-05-29T20:37:33Z"}
+{"level":"info","msg":"Starting server on port:8080","time":"2025-05-29T20:37:33Z"}
