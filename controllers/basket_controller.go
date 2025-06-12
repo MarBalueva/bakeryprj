@@ -24,7 +24,6 @@ func AddProductToBasket(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var item models.ProductInBasket
 
-		// Автоматическая валидация по тегам binding
 		if err := c.ShouldBindJSON(&item); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "некорректные данные: " + err.Error()})
 			return
